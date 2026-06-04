@@ -2,12 +2,17 @@ from textual.app import ComposeResult
 from textual.containers import Center, Middle
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label
+from luvinha.screens.base_screen import BaseScreen
 
 
-class MainMenu(Screen):
+class MainMenu(BaseScreen):
     """The main menu screen for Luvinha."""
 
-    BINDINGS = [("h", "how_to_play", "How to Play")]
+    BINDINGS = BaseScreen.BINDINGS + [("h", "how_to_play", "How to Play"), ("escape", "quit", "Quit")]
+
+    def on_mount(self) -> None:
+        self.query_one("#new-game", Button).focus()
+        self.watch(self.app, "selected_mode", self.update_mode)
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
@@ -15,13 +20,30 @@ class MainMenu(Screen):
         with Center():
             with Middle():
                 yield Label("LUVINHA", id="title")
+                yield Label("", id="mode-info")
                 yield Button("New Game", id="new-game", variant="primary")
+                yield Button("Mode Selection", id="mode-selection", variant="primary")
+
+
+    def update_mode(self, mode: str):
+        self.query_one("#mode-info", Label).update(
+            f"Selected Mode: {mode}"
+        )
+    
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "new-game":
+            self.app.exit(result="new-game")
+        elif event.button.id == "mode-selection":
+            from luvinha.screens.mode_selection import ModeSelection
+
+            self.app.push_screen(ModeSelection())
 
     def action_how_to_play(self) -> None:
         from luvinha.screens.how_to_play import HowToPlay
 
         self.app.push_screen(HowToPlay())
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "new-game":
-            self.app.exit(result="new-game")
+    def action_quit(self) -> None:
+        from luvinha.screens.quit_confirmation import QuitConfirmation
+
+        self.app.push_screen(QuitConfirmation())
