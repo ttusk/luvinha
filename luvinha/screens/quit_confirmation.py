@@ -6,18 +6,18 @@ from luvinha.screens.base_screen import BaseScreen
 from luvinha.screens.main_menu import MainMenu
 
 class QuitConfirmation(BaseScreen):
-    """A confirmation screen for quitting the game."""
+    """Tela de confirmação para sair do jogo."""
 
-    BINDINGS = BaseScreen.BINDINGS + [("y", "confirm_quit", "Yes"), ("n", "cancel_quit", "No")]
+    BINDINGS = BaseScreen.BINDINGS + [("y", "confirm_quit", "Sim"), ("n", "cancel_quit", "Não")]
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
         yield Footer()
         with Center():
             with Middle():
-                yield Label("Are you sure you want to quit?", id="quit-confirmation")
-                yield Button("Yes", id="confirm-yes", variant="error")
-                yield Button("No", id="confirm-no", variant="primary")
+                yield Label("Tem certeza que deseja sair?", id="quit-confirmation")
+                yield Button("Sim", id="confirm-yes", variant="error")
+                yield Button("Não", id="confirm-no", variant="primary")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "confirm-yes":

@@ -7,7 +7,7 @@ from luvinha.screens.base_screen import BaseScreen
 from luvinha.screens.main_menu import MainMenu
 
 class ModeSelection(BaseScreen):
-    """The mode selection screen for Luvinha."""
+    """Tela de seleção de modo do Luvinha."""
 
     BINDINGS = BaseScreen.BINDINGS
 
@@ -19,9 +19,9 @@ class ModeSelection(BaseScreen):
         yield Footer()
         with Center():
             with Middle():
-                yield Label("Select Game Mode", id="mode-title")
-                yield Button("Classic Mode", id="classic-mode", variant="primary")
-                yield Button("Timed Mode", id="timed-mode", variant="primary")
+                yield Label("Selecionar Modo de Jogo", id="mode-title")
+                yield Button("Modo Clássico", id="classic-mode", variant="primary")
+                yield Button("Modo Cronometrado", id="timed-mode", variant="primary")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         self.app.selected_mode = event.button.id

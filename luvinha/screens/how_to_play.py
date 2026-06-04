@@ -5,16 +5,16 @@ from textual.widgets import Footer, Label
 
 
 class HowToPlay(ModalScreen[None]):
-    """Modal explaining how to play."""
+    """Modal explicando como jogar."""
 
-    BINDINGS = [("escape", "close", "Close")]
+    BINDINGS = [("escape", "close", "Fechar")]
 
     def compose(self) -> ComposeResult:
         with Center():
             with Middle():
                 with Vertical(id="how-to-play-dialog"):
-                    yield Label("How to Play")
-                    yield Label("Coming soon!")
+                    yield Label("Como Jogar")
+                    yield Label("Em breve!")
                     yield Footer()
 
     def action_close(self) -> None:

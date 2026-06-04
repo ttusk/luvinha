@@ -4,7 +4,7 @@ from luvinha.screens.main_menu import MainMenu
 
 
 class LuvinhaApp(App[None]):
-    """The Luvinha word puzzle game."""
+    """O jogo Luvinha."""
 
     selected_mode = reactive("classic-mode")
 
