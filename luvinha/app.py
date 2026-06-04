@@ -8,8 +8,10 @@ class LuvinhaApp(App[None]):
 
     TITLE = "Luvinha"
     CSS_PATH = "styles.tcss"
+    ENABLE_COMMAND_PALETTE = False
 
     SCREENS = {"main_menu": MainMenu}
 
     def on_mount(self) -> None:
+        self.theme = "solarized-light"
         self.push_screen("main_menu")

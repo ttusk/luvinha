@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import Center, Middle
 from textual.screen import Screen
-from textual.widgets import Button, Header, Label
+from textual.widgets import Button, Footer, Header, Label
 
 
 class MainMenu(Screen):
@@ -11,6 +11,7 @@ class MainMenu(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
+        yield Footer()
         with Center():
             with Middle():
                 yield Label("LUVINHA", id="title")
