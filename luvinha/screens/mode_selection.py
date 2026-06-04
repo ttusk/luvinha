@@ -24,7 +24,8 @@ class ModeSelection(BaseScreen):
                 yield Button("Modo Cronometrado", id="timed-mode", variant="primary")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        self.app.selected_mode = event.button.id
+        if event.button.id is not None:
+            self.luvinha_app.selected_mode = event.button.id
 
         self.app.pop_screen()
 

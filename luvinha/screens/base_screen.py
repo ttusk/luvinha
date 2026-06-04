@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from textual.screen import Screen
+
+if TYPE_CHECKING:
+    from luvinha.app import LuvinhaApp
+
 
 class BaseScreen(Screen):
 
     BINDINGS = [
-        ("up", "focus_previous", "Focar Anterior"),
-        ("down", "focus_next", "Focar Próximo"),
-        ("b", "maybe_pop", "Voltar")
+        ("up", "focus_previous", "Anterior"),
+        ("down", "focus_next", "Próximo"),
     ]
 
     def action_focus_previous(self) -> None:
@@ -14,6 +21,6 @@ class BaseScreen(Screen):
     def action_focus_next(self) -> None:
         self.focus_next()
 
-    def action_maybe_pop(self):
-        if len(self.app.screen_stack) > 1:
-            self.app.pop_screen()
+    @property
+    def luvinha_app(self) -> LuvinhaApp:
+        return self.app  # type: ignore[return-value]

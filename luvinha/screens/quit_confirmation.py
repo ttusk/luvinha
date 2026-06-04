@@ -1,9 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import Center, Middle
-from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label
 from luvinha.screens.base_screen import BaseScreen
-from luvinha.screens.main_menu import MainMenu
 
 class QuitConfirmation(BaseScreen):
     """Tela de confirmação para sair do jogo."""
@@ -11,13 +9,12 @@ class QuitConfirmation(BaseScreen):
     BINDINGS = BaseScreen.BINDINGS + [("y", "confirm_quit", "Sim"), ("n", "cancel_quit", "Não")]
 
     def compose(self) -> ComposeResult:
-        yield Header(show_clock=False)
         yield Footer()
         with Center():
             with Middle():
                 yield Label("Tem certeza que deseja sair?", id="quit-confirmation")
-                yield Button("Sim", id="confirm-yes", variant="error")
-                yield Button("Não", id="confirm-no", variant="primary")
+                yield Button("Sim", id="confirm-yes", variant="error", flat=True)
+                yield Button("Não", id="confirm-no", variant="primary", flat=True)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "confirm-yes":

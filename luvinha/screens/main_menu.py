@@ -2,6 +2,7 @@ from textual.app import ComposeResult
 from textual.containers import Center, Middle
 from textual.widgets import Button, Footer, Header, Label
 from luvinha.screens.base_screen import BaseScreen
+from luvinha.screens.classic_mode import ClassicMode
 
 
 class MainMenu(BaseScreen):
@@ -11,27 +12,18 @@ class MainMenu(BaseScreen):
 
     def on_mount(self) -> None:
         self.query_one("#new-game", Button).focus()
-        self.watch(self.app, "selected_mode", self.update_mode)
 
     def compose(self) -> ComposeResult:
-        yield Header(show_clock=False)
         yield Footer()
         with Center():
             with Middle():
                 yield Label("LUVINHA", id="title")
-                yield Label("", id="mode-info")
-                yield Button("Novo Jogo", id="new-game", variant="primary")
-                yield Button("Selecionar Modo", id="mode-selection", variant="primary")
-
-
-    def update_mode(self, mode: str):
-        self.query_one("#mode-info", Label).update(
-            f"Modo Selecionado: {mode}"
-        )
+                yield Button("Novo Jogo", id="new-game", variant="primary", flat=True)
+                yield Button("Selecionar Modo", id="mode-selection", variant="primary", flat=True)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "new-game":
-            self.app.exit(result="new-game")
+            self.app.switch_screen(ClassicMode())
         elif event.button.id == "mode-selection":
             from luvinha.screens.mode_selection import ModeSelection
 
