@@ -11,3 +11,7 @@
   - [ ] Adicionar um botão secreto para burlar e achar a palavra, essa função tem o papel de dinamizar a apresentação das funções do joguinho para a turma
 - [ ] Embelezar a UI
 - [ ] Se possível, aplicar melhores padrões de projeto dentro do código, ex: classes reaproveitáveis, assim como o `BaseScreen`
+- [ ] Acoplar modelo do Huggingface dentro de um package no projeto
+  - [ ] Criar modulo dentro do package para o modelo
+  - [ ] Worker loop basico para polling de recebimento das mensagens, enfileirando para realização das análises
+- [ ] Verificar como rodar o modelo internamente no projeto sem necessidade de um container
