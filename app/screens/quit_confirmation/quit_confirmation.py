@@ -1,20 +1,27 @@
 from textual.app import ComposeResult
-from textual.containers import Center, Middle
+from textual.containers import Center, Middle, Horizontal
 from textual.widgets import Button, Footer, Label
 from app.screens.base_screen import BaseScreen
+
 
 class QuitConfirmation(BaseScreen):
     """Tela de confirmação para sair do jogo."""
 
-    BINDINGS = BaseScreen.BINDINGS + [("y", "confirm_quit", "Sim"), ("n", "cancel_quit", "Não")]
+    CSS_PATH = "quit_confirmation.tcss"
+
+    BINDINGS = BaseScreen.BINDINGS + [
+        ("y", "confirm_quit", "Sim"),
+        ("n", "cancel_quit", "Não"),
+    ]
 
     def compose(self) -> ComposeResult:
         yield Footer()
         with Center():
             with Middle():
                 yield Label("Tem certeza que deseja sair?", id="quit-confirmation")
-                yield Button("Sim", id="confirm-yes", variant="error", flat=True)
-                yield Button("Não", id="confirm-no", variant="primary", flat=True)
+                with Horizontal(id="quit-buttons"):
+                    yield Button("Sim", id="confirm-yes", variant="error")
+                    yield Button("Não", id="confirm-no", variant="primary")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "confirm-yes":

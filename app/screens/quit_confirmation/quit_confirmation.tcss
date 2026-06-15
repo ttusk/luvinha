@@ -1,0 +1,21 @@
+QuitConfirmation {
+    align: center middle;
+}
+
+#quit-confirmation {
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 1 0;
+}
+
+#quit-buttons {
+    width: auto;
+    height: auto;
+    align-horizontal: center;
+}
+
+QuitConfirmation Button {
+    width: 14;
+    margin: 0 1;
+}

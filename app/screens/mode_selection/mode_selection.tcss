@@ -1,0 +1,22 @@
+ModeSelection {
+    align: center middle;
+}
+
+#mode-title {
+    text-style: bold;
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 1 0;
+}
+
+#mode-buttons {
+    width: auto;
+    height: auto;
+    align: center middle;
+}
+
+ModeSelection Button {
+    width: 28;
+    margin: 1 0;
+}

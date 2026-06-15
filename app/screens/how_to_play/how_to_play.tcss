@@ -1,0 +1,27 @@
+HowToPlay {
+    align: center middle;
+}
+
+#how-to-play-dialog {
+    background: $surface;
+    border: thick $primary;
+    padding: 2 4;
+    width: 60;
+    height: auto;
+    align: center middle;
+}
+
+#how-to-play-title {
+    text-style: bold;
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 1 0;
+}
+
+#how-to-play-line {
+    width: 100%;
+    text-align: center;
+    height: auto;
+    padding: 0 0;
+}

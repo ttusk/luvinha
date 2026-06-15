@@ -1,0 +1,22 @@
+MainMenu {
+    align: center middle;
+}
+
+#title {
+    text-style: bold;
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 1 0;
+}
+
+#menu-buttons {
+    width: auto;
+    height: auto;
+    align: center middle;
+}
+
+MainMenu Button {
+    width: 28;
+    margin: 1 0;
+}
