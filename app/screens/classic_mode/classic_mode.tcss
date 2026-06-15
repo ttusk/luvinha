@@ -1,11 +1,66 @@
-#status-bar {
-    dock: top;
+ClassicMode {
+    layout: vertical;
+}
+
+#game-container {
+    width: 100%;
+    height: 100%;
+    padding: 0 2;
+}
+
+#input-bar {
+    width: 100%;
     height: 3;
+    margin: 1 0;
+}
+
+#guess-input {
+    width: 1fr;
+    margin-right: 1;
+}
+
+#give-up {
+    width: auto;
+    margin: 0;
+}
+
+#status-bar {
+    width: 100%;
+    height: 3;
+    margin-bottom: 1;
 }
 
 #attempts,
-#best-rank,
-#game-mode {
+#best-rank {
     width: 1fr;
     content-align: center middle;
+}
+
+#loading-indicator {
+    height: 1;
+    margin: 1 0;
+}
+
+#ranking {
+    width: 100%;
+    height: 1fr;
+    min-height: 10;
+    max-height: 1fr;
+    border: solid $primary;
+    padding: 0 1;
+    overflow-y: auto;
+}
+
+#ranking-grid {
+    width: 100%;
+    height: auto;
+    layout: grid;
+    grid-columns: 1fr 1fr;
+    grid-rows: auto;
+    grid-gutter: 1;
+}
+
+#ranking-grid GuessItem {
+    height: 3;
+    margin: 0;
 }
