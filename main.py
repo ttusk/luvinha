@@ -1,4 +1,4 @@
-from luvinha.app import LuvinhaApp
+from app import LuvinhaApp
 
 
 def main():

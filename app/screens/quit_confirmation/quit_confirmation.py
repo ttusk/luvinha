@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.containers import Center, Middle
-from textual.widgets import Button, Footer, Header, Label
-from luvinha.screens.base_screen.base_screen import BaseScreen
+from textual.widgets import Button, Footer, Label
+from app.screens.base_screen import BaseScreen
 
 class QuitConfirmation(BaseScreen):
     """Tela de confirmação para sair do jogo."""

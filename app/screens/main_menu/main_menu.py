@@ -1,8 +1,8 @@
 from textual.app import ComposeResult
 from textual.containers import Center, Middle
-from textual.widgets import Button, Footer, Header, Label
-from luvinha.screens.base_screen.base_screen import BaseScreen
-from luvinha.screens.classic_mode.classic_mode import ClassicMode
+from textual.widgets import Button, Footer, Label
+from app.screens.base_screen import BaseScreen
+from app.screens.classic_mode import ClassicMode
 
 
 class MainMenu(BaseScreen):
@@ -25,16 +25,16 @@ class MainMenu(BaseScreen):
         if event.button.id == "new-game":
             self.app.switch_screen(ClassicMode())
         elif event.button.id == "mode-selection":
-            from luvinha.screens.mode_selection.mode_selection import ModeSelection
+            from app.screens.mode_selection import ModeSelection
 
             self.app.push_screen(ModeSelection())
 
     def action_how_to_play(self) -> None:
-        from luvinha.screens.how_to_play.how_to_play import HowToPlay
+        from app.screens.how_to_play import HowToPlay
 
         self.app.push_screen(HowToPlay())
 
     def action_quit(self) -> None:
-        from luvinha.screens.quit_confirmation.quit_confirmation import QuitConfirmation
+        from app.screens.quit_confirmation import QuitConfirmation
 
         self.app.push_screen(QuitConfirmation())

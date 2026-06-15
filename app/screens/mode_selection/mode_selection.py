@@ -1,10 +1,8 @@
 from textual.app import ComposeResult
 from textual.containers import Center, Middle
-from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label
 
-from luvinha.screens.base_screen.base_screen import BaseScreen
-from luvinha.screens.main_menu.main_menu import MainMenu
+from app.screens.base_screen import BaseScreen
 
 class ModeSelection(BaseScreen):
     """Tela de seleção de modo do Luvinha."""

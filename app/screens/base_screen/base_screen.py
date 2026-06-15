@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from textual.screen import Screen
 
 if TYPE_CHECKING:
-    from luvinha.app import LuvinhaApp
+    from app import LuvinhaApp
 
 
 class BaseScreen(Screen):

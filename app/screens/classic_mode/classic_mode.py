@@ -1,4 +1,3 @@
-from textual import on
 from textual.reactive import reactive
 from textual.app import ComposeResult
 from textual.containers import Horizontal, VerticalScroll
@@ -12,12 +11,9 @@ from textual.widgets import (
     DataTable
 )
 
-from luvinha.screens.base_screen.base_screen import BaseScreen
+from app.screens.base_screen import BaseScreen
 
-from ..base_screen.base_screen import BaseScreen
-from textual.widgets import Label
-
-class ClassicMode(BaseScreen, VerticalScroll):
+class ClassicMode(BaseScreen):
     def on_mount(self) -> None:
         self.watch(self, "tentativas", self.update_attempts)
         self.watch(self, "maior_proximidade", self.update_best_rank)
@@ -33,32 +29,33 @@ class ClassicMode(BaseScreen, VerticalScroll):
             yield Label(f"Tentativas: {self.tentativas}", id="attempts")
             yield Label(f"Melhor posição: {self.maior_proximidade if self.maior_proximidade else 'N/A'}, Palpite: {self.melhor_palpite if self.melhor_palpite else 'N/A'}", id="best-rank")
 
-        yield Input(
-            placeholder="Digite uma palavra...",
-            id="guess-input",
-            type="text",
-            validators=[Length(minimum=1)]
-        )
+        with VerticalScroll(id="game-scroll"):
+            yield Input(
+                placeholder="Digite uma palavra...",
+                id="guess-input",
+                type="text",
+                validators=[Length(minimum=1)]
+            )
 
-        yield Button(
-            "Desistir",
-            id="give-up",
-            variant="error"
-        )
+            yield Button(
+                "Desistir",
+                id="give-up",
+                variant="error"
+            )
 
-        yield Label("Ranking de proximidade")
+            yield Label("Ranking de proximidade")
 
-        table = DataTable(id="ranking", show_cursor=False, cursor_type="none")
-        table.add_columns(
-            "#",
-            "Palavra",
-            "Proximidade"
-        )
+            table = DataTable(id="ranking", show_cursor=False, cursor_type="none")
+            table.add_columns(
+                "#",
+                "Palavra",
+                "Proximidade"
+            )
 
-        yield table
+            yield table
 
         yield Footer()
-    
+
     def update_attempts(self, tentativas: int) -> None:
         self.query_one("#attempts", Label).update(
             f"Tentativas: {tentativas}"
@@ -70,7 +67,7 @@ class ClassicMode(BaseScreen, VerticalScroll):
         )
 
     CSS_PATH = "classic_mode.tcss"
-    
+
     BUTTONS = BaseScreen.BINDINGS
 
     FAKE_SIMILARITIES = {
@@ -94,7 +91,7 @@ class ClassicMode(BaseScreen, VerticalScroll):
         guess = event.value.strip().lower()
         if not guess:
             return
-        
+
         self.tentativas += 1
 
         # Pegar proximidade do glove
@@ -119,6 +116,6 @@ class ClassicMode(BaseScreen, VerticalScroll):
         event: Button.Pressed
     ) -> None:
         if event.button.id == "give-up":
-            from luvinha.screens.quit_confirmation.quit_confirmation import QuitConfirmation
+            from app.screens.quit_confirmation import QuitConfirmation
             #Implementar confirmação de desistência, por enquanto é apenas quit
             self.app.push_screen(QuitConfirmation())

@@ -1,9 +1,7 @@
 from textual.app import App
 from textual.reactive import reactive
-from luvinha.screens.main_menu.main_menu import MainMenu
-from luvinha.screens.classic_mode.classic_mode import ClassicMode
-from luvinha.screens.mode_selection.mode_selection import ModeSelection
-from luvinha.screens.quit_confirmation.quit_confirmation import QuitConfirmation
+from app.screens.main_menu import MainMenu
+from app.screens.classic_mode import ClassicMode
 
 
 class LuvinhaApp(App[None]):
