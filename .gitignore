@@ -14,3 +14,6 @@ __pypackages__/
 
 # Ruff stuff:
 .ruff_cache/
+
+# Egg info
+*.egg-info/
