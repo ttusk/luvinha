@@ -19,4 +19,3 @@
   - [ ] Permitir cadastrar username ao vencer
 - [ ] Botão secreto de cheat para dinamizar apresentações
 - [ ] Continuar embelezando a UI
-- [ ] Aplicar mais padrões de projeto no código
