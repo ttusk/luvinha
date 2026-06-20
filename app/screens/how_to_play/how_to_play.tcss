@@ -19,7 +19,7 @@ HowToPlay {
     padding: 1 0;
 }
 
-#how-to-play-line {
+.how-to-play-line {
     width: 100%;
     text-align: center;
     height: auto;
