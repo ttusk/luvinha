@@ -23,6 +23,7 @@ class MainMenu(BaseScreen):
                 with Vertical(id="menu-buttons"):
                     yield Button("Novo Jogo", id="new-game", variant="primary")
                     yield Button("Selecionar Modo", id="mode-selection", variant="primary")
+                    yield Button("Ranking", id="leaderboard", variant="default")
 
     def on_mount(self) -> None:
         self.query_one("#new-game", Button).focus()
@@ -33,6 +34,9 @@ class MainMenu(BaseScreen):
         elif event.button.id == "mode-selection":
             from app.screens.mode_selection import ModeSelection
             self.app.push_screen(ModeSelection())
+        elif event.button.id == "leaderboard":
+            from app.screens.leaderboard import LeaderboardScreen
+            self.app.push_screen(LeaderboardScreen())
 
     def action_how_to_play(self) -> None:
         from app.screens.how_to_play import HowToPlay
