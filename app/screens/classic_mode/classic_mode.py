@@ -119,8 +119,14 @@ class ClassicMode(BaseScreen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "give-up":
-            from app.screens.quit_confirmation import QuitConfirmation
-            self.app.push_screen(QuitConfirmation())
+            from app.screens.give_up import GiveUpScreen
+            self.app.push_screen(
+                GiveUpScreen(secret_word=self.secret_word, attempts=self.tentativas),
+                callback=self._return_to_menu,
+            )
+
+    def _return_to_menu(self, _result: object) -> None:
+        self.app.pop_screen()
 
     def action_go_back(self) -> None:
         self.app.pop_screen()

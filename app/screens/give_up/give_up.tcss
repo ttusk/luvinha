@@ -1,0 +1,58 @@
+GiveUpScreen {
+    align: center middle;
+}
+
+#give-up-dialog {
+    background: $surface;
+    border: thick $primary;
+    padding: 2 4;
+    width: 64;
+    height: auto;
+    align: center middle;
+}
+
+#give-up-title {
+    text-style: bold;
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 0 0 1 0;
+    color: $primary;
+}
+
+#give-up-message {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    color: $text-muted;
+    padding: 0 0 1 0;
+}
+
+#give-up-hint {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    padding: 1 0 0 0;
+}
+
+#secret-word {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    text-style: bold;
+    color: $accent;
+    padding: 0 0 1 0;
+}
+
+#attempts {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    color: $text;
+    padding: 0 0 1 0;
+}
+
+#back-to-menu {
+    width: 24;
+    align-horizontal: center;
+}

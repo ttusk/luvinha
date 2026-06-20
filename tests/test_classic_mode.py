@@ -6,7 +6,7 @@ from app import LuvinhaApp
 from app.screens.classic_mode import classic_mode as classic_mode_module
 from app.screens.classic_mode import ClassicMode
 from app.screens.main_menu import MainMenu
-from textual.widgets import Input
+from textual.widgets import Input, Label
 
 
 class FakeGloveModel:
@@ -53,3 +53,33 @@ async def test_escape_returns_to_main_menu(monkeypatch: pytest.MonkeyPatch) -> N
         await pilot.press("escape")
         await pilot.pause()
         assert isinstance(app.screen, MainMenu)
+
+
+async def _submit_guess(pilot, word: str) -> None:
+    screen = pilot.app.screen
+    assert isinstance(screen, ClassicMode)
+    screen.query_one("#guess-input", Input).value = word
+    await pilot.press("enter")
+    await pilot.pause()
+
+
+async def test_give_up_reveals_secret_and_returns_to_menu(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+        await _submit_guess(pilot, "cachorro")
+
+        await pilot.click("#give-up")
+        await pilot.pause()
+
+        results = app.screen
+        assert "gato" in str(results.query_one("#secret-word", Label).content)
+        assert "1" in str(results.query_one("#attempts", Label).content)
+
+        await pilot.click("#back-to-menu")
+        await pilot.pause()
+        assert isinstance(app.screen, MainMenu)
+        assert app.is_running
