@@ -8,7 +8,6 @@ from app.screens.classic_mode import ClassicMode
 from app.screens.main_menu import MainMenu
 from textual.widgets import Input, Label
 
-
 class FakeGloveModel:
     """In-memory stand-in for GloveModel so UI tests need no 1.12 GB download."""
 
@@ -83,3 +82,29 @@ async def test_give_up_reveals_secret_and_returns_to_menu(
         await pilot.pause()
         assert isinstance(app.screen, MainMenu)
         assert app.is_running
+
+
+async def test_invalid_word_placeholder_restores_after_rapid_input(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+        screen = app.screen
+        assert isinstance(screen, ClassicMode)
+
+        await _submit_guess(pilot, "xyzw")
+        await pilot.pause(0.05)
+        await _submit_guess(pilot, "zzzz")
+        await pilot.pause(0.05)
+        assert (
+            screen.query_one("#guess-input", Input).placeholder
+            == classic_mode_module.INVALID_PLACEHOLDER
+        )
+
+        await pilot.pause(2.0)
+        assert (
+            screen.query_one("#guess-input", Input).placeholder
+            == "Digite uma palavra..."
+        )

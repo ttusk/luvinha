@@ -15,6 +15,9 @@ from app.screens.base_screen import BaseScreen
 from app.screens.classic_mode.guess_item import GuessItem
 from glove import GloveModel, WordValidator
 
+INVALID_PLACEHOLDER = "Palavra não reconhecida"
+DEFAULT_PLACEHOLDER = "Digite uma palavra..."
+
 
 class ClassicMode(BaseScreen):
     """Tela do modo clássico de jogo."""
@@ -30,6 +33,8 @@ class ClassicMode(BaseScreen):
 
     def on_mount(self) -> None:
         self.glove = GloveModel()
+        self._restore_timer = None
+        self._original_placeholder = DEFAULT_PLACEHOLDER
         self.run_worker(self.glove.load, name="load_glove", thread=True)
 
     def compose(self) -> ComposeResult:
@@ -39,7 +44,7 @@ class ClassicMode(BaseScreen):
         with Vertical(id="game-container"):
             with Horizontal(id="input-bar"):
                 yield Input(
-                    placeholder="Digite uma palavra...",
+                    placeholder=DEFAULT_PLACEHOLDER,
                     id="guess-input",
                     type="text",
                     validators=[Length(minimum=1)],
@@ -108,14 +113,17 @@ class ClassicMode(BaseScreen):
 
     def _show_invalid_word(self) -> None:
         input_widget = self.query_one("#guess-input", Input)
-        original_placeholder = input_widget.placeholder
-        input_widget.placeholder = "Palavra não reconhecida"
+        if input_widget.placeholder != INVALID_PLACEHOLDER:
+            self._original_placeholder = input_widget.placeholder
+        input_widget.placeholder = INVALID_PLACEHOLDER
         input_widget.value = ""
+        if self._restore_timer is not None:
+            self._restore_timer.stop()
+        self._restore_timer = self.set_timer(1.5, self._restore_placeholder)
 
-        def restore() -> None:
-            input_widget.placeholder = original_placeholder
-
-        self.set_timer(1.5, restore)
+    def _restore_placeholder(self) -> None:
+        self._restore_timer = None
+        self.query_one("#guess-input", Input).placeholder = self._original_placeholder
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "give-up":
