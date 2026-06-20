@@ -21,8 +21,12 @@ package = true
 [tool.setuptools.packages.find]
 include = ["app*", "glove*"]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.0",
+    "pytest-asyncio>=1.4.0",
     "textual-dev>=1.8.0",
 ]
