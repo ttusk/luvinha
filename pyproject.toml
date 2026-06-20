@@ -19,7 +19,7 @@ luvinha = "main:main"
 package = true
 
 [tool.setuptools.packages.find]
-include = ["app*", "glove*"]
+include = ["app*", "glove*", "leaderboard*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
