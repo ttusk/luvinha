@@ -29,6 +29,10 @@ class FakeGloveModel:
     def similarity(self, word1: str, word2: str) -> float:
         return 1.0 if word1 == word2 else 0.42
 
+    def most_similar(self, word: str, n: int = 10) -> list[tuple[str, float]]:
+        hints = [("felino", 0.91), ("leao", 0.83), ("cachorro", 0.71), ("carro", 0.42)]
+        return hints[:n]
+
 
 async def _start_game(pilot, secret: str = "gato") -> None:
     """Drive the real 'Novo Jogo' flow and wait for the guess input to enable."""
@@ -157,3 +161,23 @@ async def test_victory_skip_does_not_save(
         assert isinstance(app.screen, MainMenu)
 
     assert lb.is_empty()
+
+
+async def test_cheat_reveals_nearest_words(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+
+        await pilot.press("ctrl+shift+c")
+        await pilot.pause()
+
+        texts = [
+            str(w.content) for w in app.screen.walk_children() if hasattr(w, "content")
+        ]
+        assert any("felino" in t for t in texts)
+        assert any("leao" in t for t in texts)
+
+        await pilot.press("escape")
+        await pilot.pause()
+        assert isinstance(app.screen, ClassicMode)

@@ -1,5 +1,6 @@
 from textual.reactive import reactive
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Grid, Horizontal, VerticalScroll, Vertical
 from textual.validation import Length
 from textual.widgets import (
@@ -24,7 +25,10 @@ class ClassicMode(BaseScreen):
 
     CSS_PATH = "classic_mode.tcss"
 
-    BINDINGS = BaseScreen.BINDINGS + [("escape", "go_back", "Voltar")]
+    BINDINGS = BaseScreen.BINDINGS + [
+        ("escape", "go_back", "Voltar"),
+        Binding("ctrl+shift+c", "cheat", "Cheat", show=False),
+    ]
 
     maior_proximidade = reactive(None)
     melhor_palpite = reactive("")
@@ -125,6 +129,14 @@ class ClassicMode(BaseScreen):
             ),
             callback=self._return_to_menu,
         )
+
+    def action_cheat(self) -> None:
+        if not self.glove.is_loaded:
+            return
+        from app.screens.cheat import CheatScreen
+
+        hints = self.glove.most_similar(self.secret_word, n=5)
+        self.app.push_screen(CheatScreen(hints=hints))
 
     def _show_invalid_word(self) -> None:
         input_widget = self.query_one("#guess-input", Input)
