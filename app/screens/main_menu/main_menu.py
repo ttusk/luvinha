@@ -29,7 +29,7 @@ class MainMenu(BaseScreen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "new-game":
-            self.app.switch_screen(ClassicMode())
+            self.app.push_screen(ClassicMode())
         elif event.button.id == "mode-selection":
             from app.screens.mode_selection import ModeSelection
             self.app.push_screen(ModeSelection())
