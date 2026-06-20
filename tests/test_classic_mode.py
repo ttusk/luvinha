@@ -256,3 +256,54 @@ async def test_ranking_preserves_scroll_on_new_guess(
         await _submit_guess(pilot, "rio")
         await pilot.pause(0.1)
         assert ranking.scroll_y == y_before
+
+
+async def test_auto_win_button_hidden_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+        assert app.screen.query_one("#auto-win").display is False
+
+
+async def test_key_combo_reveals_auto_win_button(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+        await pilot.press("ctrl+shift+w")
+        await pilot.pause()
+        assert app.screen.query_one("#auto-win").display is True
+
+
+async def test_auto_win_button_triggers_victory(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    lb = Leaderboard(db_path=tmp_path / "lb.db")
+    app = LuvinhaApp(leaderboard=lb)
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+
+        await pilot.press("ctrl+shift+w")
+        await pilot.pause()
+        await pilot.click("#auto-win")
+        await pilot.pause()
+
+        win = app.screen
+        assert "gato" in str(win.query_one("#secret-word", Label).content)
+
+        win.query_one("#username", Input).value = "apresentador"
+        await pilot.click("#save-score")
+        await pilot.pause()
+        assert isinstance(app.screen, MainMenu)
+
+    entries = lb.top()
+    assert len(entries) == 1
+    assert entries[0].username == "apresentador"
+    assert entries[0].word == "gato"

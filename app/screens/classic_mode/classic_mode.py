@@ -28,6 +28,7 @@ class ClassicMode(BaseScreen):
     BINDINGS = BaseScreen.BINDINGS + [
         ("escape", "go_back", "Voltar"),
         Binding("ctrl+shift+c", "cheat", "Cheat", show=False),
+        Binding("ctrl+shift+w", "reveal_auto_win", "Auto Win", show=False),
     ]
 
     maior_proximidade = reactive(None)
@@ -55,6 +56,7 @@ class ClassicMode(BaseScreen):
                     disabled=True,
                 )
                 yield Button("Desistir", id="give-up", variant="error", disabled=True)
+                yield Button("Auto Win", id="auto-win", variant="success", disabled=True)
 
             with Horizontal(id="status-bar"):
                 yield Label("Tentativas: 0", id="attempts")
@@ -83,6 +85,7 @@ class ClassicMode(BaseScreen):
             self.query_one("#loading").display = False
             self.query_one("#guess-input", Input).disabled = False
             self.query_one("#give-up", Button).disabled = False
+            self.query_one("#auto-win", Button).disabled = False
             self.query_one("#guess-input", Input).focus()
 
     def update_attempts(self, tentativas: int) -> None:
@@ -100,7 +103,9 @@ class ClassicMode(BaseScreen):
             grid.mount(GuessItem(word=palavra, score=prox))
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        guess = event.value.strip().lower()
+        self._process_guess(event.value.strip().lower())
+
+    def _process_guess(self, guess: str) -> None:
         if not guess or guess in self.guesses:
             return
 
@@ -143,6 +148,11 @@ class ClassicMode(BaseScreen):
         hints = self.glove.most_similar(self.secret_word, n=5)
         self.app.push_screen(CheatScreen(hints=hints))
 
+    def action_reveal_auto_win(self) -> None:
+        if not self.glove.is_loaded:
+            return
+        self.query_one("#auto-win", Button).display = True
+
     def _show_invalid_word(self) -> None:
         input_widget = self.query_one("#guess-input", Input)
         if input_widget.placeholder != INVALID_PLACEHOLDER:
@@ -164,6 +174,8 @@ class ClassicMode(BaseScreen):
                 GiveUpScreen(secret_word=self.secret_word, attempts=self.tentativas),
                 callback=self._return_to_menu,
             )
+        elif event.button.id == "auto-win":
+            self._process_guess(self.secret_word)
 
     def _return_to_menu(self, _result: object) -> None:
         self.app.pop_screen()
