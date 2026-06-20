@@ -60,7 +60,12 @@ class ClassicMode(BaseScreen):
                 yield Label("Tentativas: 0", id="attempts")
                 yield Label("Melhor: - (-)", id="best-rank")
 
-            yield LoadingIndicator(id="loading-indicator")
+            with Vertical(id="loading"):
+                yield Label(
+                    "Carregando o modelo de palavras... a primeira vez pode demorar.",
+                    id="loading-message",
+                )
+                yield LoadingIndicator(id="loading-indicator")
             with VerticalScroll(id="ranking"):
                 yield Grid(id="ranking-grid")
 
@@ -75,7 +80,7 @@ class ClassicMode(BaseScreen):
             self.watch(self, "tentativas", self.update_attempts)
             self.watch(self, "maior_proximidade", self.update_best_rank)
             self.watch(self, "guesses", self.update_ranking)
-            self.query_one("#loading-indicator", LoadingIndicator).display = False
+            self.query_one("#loading").display = False
             self.query_one("#guess-input", Input).disabled = False
             self.query_one("#give-up", Button).disabled = False
             self.query_one("#guess-input", Input).focus()

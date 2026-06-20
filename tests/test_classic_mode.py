@@ -12,10 +12,15 @@ from textual.widgets import Input, Label
 class FakeGloveModel:
     """In-memory stand-in for GloveModel so UI tests need no 1.12 GB download."""
 
+    KNOWN = {
+        "gato", "cachorro", "carro", "felino", "tigre", "urso", "pato",
+        "lobo", "cavalo", "elefante", "coelho", "veado", "raposa",
+    }
+
     def __init__(self, secret: str = "gato") -> None:
         self.is_loaded = True
         self._secret = secret
-        self._known = {"gato", "cachorro", "carro", "felino", "leao"}
+        self._known = self.KNOWN
 
     def load(self, cache_dir: object = None) -> None:
         return None
@@ -34,6 +39,15 @@ class FakeGloveModel:
         return hints[:n]
 
 
+class SlowFakeGloveModel(FakeGloveModel):
+    """Fake model whose load() blocks briefly so the loading UI is observable."""
+
+    def load(self, cache_dir: object = None) -> None:
+        import time
+
+        time.sleep(0.3)
+
+
 async def _start_game(pilot, secret: str = "gato") -> None:
     """Drive the real 'Novo Jogo' flow and wait for the guess input to enable."""
     await pilot.click("#new-game")
@@ -47,6 +61,14 @@ async def _start_game(pilot, secret: str = "gato") -> None:
             except Exception:
                 pass
     raise AssertionError("ClassicMode did not become ready in time")
+
+
+async def _wait_until_classic(pilot) -> ClassicMode:
+    for _ in range(100):
+        await pilot.pause(0.01)
+        if isinstance(pilot.app.screen, ClassicMode):
+            return pilot.app.screen
+    raise AssertionError("ClassicMode did not open in time")
 
 
 async def test_escape_returns_to_main_menu(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -181,3 +203,24 @@ async def test_cheat_reveals_nearest_words(monkeypatch: pytest.MonkeyPatch) -> N
         await pilot.press("escape")
         await pilot.pause()
         assert isinstance(app.screen, ClassicMode)
+
+
+async def test_loading_message_shown_before_model_ready(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", SlowFakeGloveModel)
+    app = LuvinhaApp()
+    async with app.run_test() as pilot:
+        await pilot.click("#new-game")
+        screen = await _wait_until_classic(pilot)
+        assert "Carregando" in str(
+            screen.query_one("#loading-message", Label).content
+        )
+        assert screen.query_one("#loading").display is True
+        assert screen.query_one("#guess-input", Input).disabled
+
+        for _ in range(100):
+            await pilot.pause(0.02)
+            if not screen.query_one("#guess-input", Input).disabled:
+                break
+        assert screen.query_one("#loading").display is False
