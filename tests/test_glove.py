@@ -1,6 +1,7 @@
 import pytest
 
 from glove import GloveModel
+from glove import glove as glove_module
 
 RELATED_PAIRS = [
     ("garçom", "chef"),
@@ -84,3 +85,29 @@ def test_most_similar_ranked_and_excludes_self(model: GloveModel) -> None:
 def test_has_word(model: GloveModel) -> None:
     assert model.has_word("gato") is True
     assert model.has_word("xyzw1234") is False
+
+
+def test_random_word_caches_eligible_list(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import numpy as np
+
+    model = GloveModel()
+    model._vocab = ["gato", "carro", "zzzz", "ab"]
+    model._word_to_index = {w: i for i, w in enumerate(model._vocab)}
+    model._vectors = np.zeros((4, 3))
+
+    valid = {"gato", "carro"}
+    calls = {"n": 0}
+
+    def spy(word: str) -> bool:
+        calls["n"] += 1
+        return word in valid
+
+    monkeypatch.setattr(glove_module, "is_valid_word", spy)
+
+    assert model.random_word() in valid
+    calls_after_first = calls["n"]
+
+    assert model.random_word() in valid
+    assert calls["n"] == calls_after_first

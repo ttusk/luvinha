@@ -19,12 +19,14 @@ class GloveModel:
         self._vectors: np.ndarray | None = None
         self._vocab: list[str] = []
         self._word_to_index: dict[str, int] = {}
+        self._eligible_words: list[str] | None = None
 
     @property
     def is_loaded(self) -> bool:
         return self._vectors is not None
 
     def load(self, cache_dir: str | Path | None = None) -> None:
+        self._eligible_words = None
         embeddings_path = hf_hub_download(
             repo_id=REPO_ID,
             filename=EMBEDDINGS_FILE,
@@ -90,8 +92,9 @@ class GloveModel:
     def random_word(self) -> str:
         if not self.is_loaded:
             raise RuntimeError("Model not loaded. Call load() first.")
-        eligible = [w for w in self._vocab if is_valid_word(w)]
-        return random.choice(eligible)
+        if self._eligible_words is None:
+            self._eligible_words = [w for w in self._vocab if is_valid_word(w)]
+        return random.choice(self._eligible_words)
 
     def _get_vector(self, word: str) -> np.ndarray | None:
         assert self._vectors is not None
