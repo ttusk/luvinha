@@ -111,6 +111,21 @@ class ClassicMode(BaseScreen):
 
         self.query_one("#guess-input", Input).value = ""
 
+        if guess == self.secret_word:
+            self._on_win()
+
+    def _on_win(self) -> None:
+        from app.screens.win import WinScreen
+
+        self.app.push_screen(
+            WinScreen(
+                secret_word=self.secret_word,
+                attempts=self.tentativas,
+                leaderboard=self.app.leaderboard,
+            ),
+            callback=self._return_to_menu,
+        )
+
     def _show_invalid_word(self) -> None:
         input_widget = self.query_one("#guess-input", Input)
         if input_widget.placeholder != INVALID_PLACEHOLDER:

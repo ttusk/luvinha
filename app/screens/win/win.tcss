@@ -1,0 +1,66 @@
+WinScreen {
+    align: center middle;
+}
+
+#win-dialog {
+    background: $surface;
+    border: thick $success;
+    padding: 2 4;
+    width: 64;
+    height: auto;
+    align: center middle;
+}
+
+#win-title {
+    text-style: bold;
+    text-align: center;
+    width: 100%;
+    height: auto;
+    padding: 0 0 1 0;
+    color: $success;
+}
+
+#win-hint {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    padding: 1 0 0 0;
+}
+
+#secret-word {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    text-style: bold;
+    color: $accent;
+    padding: 0 0 1 0;
+}
+
+#attempts {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    color: $text;
+    padding: 0 0 1 0;
+}
+
+#username {
+    width: 100%;
+    height: 3;
+    margin: 0 0 1 0;
+}
+
+#win-buttons {
+    width: 100%;
+    height: auto;
+    align-horizontal: center;
+}
+
+#save-score {
+    width: 22;
+    margin: 0 1 0 0;
+}
+
+#skip-save {
+    width: 12;
+}

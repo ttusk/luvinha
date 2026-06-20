@@ -6,6 +6,7 @@ from app import LuvinhaApp
 from app.screens.classic_mode import classic_mode as classic_mode_module
 from app.screens.classic_mode import ClassicMode
 from app.screens.main_menu import MainMenu
+from leaderboard import Leaderboard
 from textual.widgets import Input, Label
 
 class FakeGloveModel:
@@ -108,3 +109,51 @@ async def test_invalid_word_placeholder_restores_after_rapid_input(
             screen.query_one("#guess-input", Input).placeholder
             == "Digite uma palavra..."
         )
+
+
+async def test_victory_saves_to_leaderboard(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    lb = Leaderboard(db_path=tmp_path / "lb.db")
+    app = LuvinhaApp(leaderboard=lb)
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+
+        await _submit_guess(pilot, "gato")
+        await pilot.pause()
+
+        win = app.screen
+        assert "gato" in str(win.query_one("#secret-word", Label).content)
+        assert "1" in str(win.query_one("#attempts", Label).content)
+
+        win.query_one("#username", Input).value = "ana"
+        await pilot.click("#save-score")
+        await pilot.pause()
+        assert isinstance(app.screen, MainMenu)
+
+    entries = lb.top()
+    assert len(entries) == 1
+    assert entries[0].username == "ana"
+    assert entries[0].word == "gato"
+    assert entries[0].attempts == 1
+
+
+async def test_victory_skip_does_not_save(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    lb = Leaderboard(db_path=tmp_path / "lb.db")
+    app = LuvinhaApp(leaderboard=lb)
+    async with app.run_test() as pilot:
+        await _start_game(pilot)
+        await _submit_guess(pilot, "gato")
+        await pilot.pause()
+
+        await pilot.click("#skip-save")
+        await pilot.pause()
+        assert isinstance(app.screen, MainMenu)
+
+    assert lb.is_empty()
