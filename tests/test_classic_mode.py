@@ -7,6 +7,7 @@ from app.screens.classic_mode import classic_mode as classic_mode_module
 from app.screens.classic_mode import ClassicMode
 from app.screens.main_menu import MainMenu
 from leaderboard import Leaderboard
+from textual.containers import VerticalScroll
 from textual.widgets import Input, Label
 
 class FakeGloveModel:
@@ -15,6 +16,10 @@ class FakeGloveModel:
     KNOWN = {
         "gato", "cachorro", "carro", "felino", "tigre", "urso", "pato",
         "lobo", "cavalo", "elefante", "coelho", "veado", "raposa",
+        "bola", "mesa", "porta", "janela", "cama", "rua", "livro",
+        "caderno", "tijolo", "parede", "telhado", "jardim", "floresta",
+        "rio", "monte", "ponte", "caverna", "pedra", "areia", "nuvem",
+        "chuva", "neve", "fogo",
     }
 
     def __init__(self, secret: str = "gato") -> None:
@@ -224,3 +229,30 @@ async def test_loading_message_shown_before_model_ready(
             if not screen.query_one("#guess-input", Input).disabled:
                 break
         assert screen.query_one("#loading").display is False
+
+
+async def test_ranking_preserves_scroll_on_new_guess(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(classic_mode_module, "GloveModel", FakeGloveModel)
+    app = LuvinhaApp()
+    words = [
+        "bola", "mesa", "porta", "janela", "cama", "rua", "livro",
+        "caderno", "tijolo", "parede", "telhado", "jardim", "floresta",
+    ]
+    async with app.run_test() as pilot:
+        await pilot.resize_terminal(80, 18)
+        await _start_game(pilot)
+        screen = app.screen
+        for w in words:
+            await _submit_guess(pilot, w)
+        ranking = screen.query_one("#ranking", VerticalScroll)
+        await pilot.pause(0.1)
+        ranking.scroll_to(y=5, animate=False)
+        await pilot.pause(0.1)
+        y_before = ranking.scroll_y
+        assert y_before > 0
+
+        await _submit_guess(pilot, "rio")
+        await pilot.pause(0.1)
+        assert ranking.scroll_y == y_before
