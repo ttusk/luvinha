@@ -19,7 +19,12 @@ class ModeSelection(BaseScreen):
                 yield Label("Selecionar Modo de Jogo", id="mode-title")
                 with Vertical(id="mode-buttons"):
                     yield Button("Modo Clássico", id="classic-mode", variant="primary")
-                    yield Button("Modo Cronometrado", id="timed-mode", variant="primary")
+                    yield Button(
+                        "Modo Cronometrado (em breve)",
+                        id="timed-mode",
+                        variant="default",
+                        disabled=True,
+                    )
 
     def on_mount(self) -> None:
         self.query_one("#classic-mode", Button).focus()
