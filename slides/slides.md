@@ -17,7 +17,7 @@ Luiz Gustavo, Leonardo Brito, Karoline Rodrigues, Raquel, Enzo, Breno e André
 
 Jogo inspirado no Contexto. Adivinhe uma palavra secreta em português baseado em proximidade semântica.
 
-Cada palpite recebe uma pontuação de 0 a 1000. 1000 = palavra exata.
+Cada palpite recebe uma pontuação de −1000 a 1000. 1000 = palavra exata.
 
 ```
 > gato        →  850  ████████░░
@@ -77,7 +77,7 @@ Mede o ângulo θ entre dois vetores de embedding:
 - θ entre **cachorro** e **gato**: pequeno → similaridade alta
 - θ entre **cachorro** e **abelha**: grande → similaridade baixa
 
-Retorna valor em [−1, 1]. No jogo, normalizamos para [0, 1000].
+Retorna valor em [−1, 1]. O score é `round(cos × 1000)`, variando de −1000 a 1000.
 
 A busca por palavras mais similares é feita via multiplicação de matrizes (`vectors @ vec`), calculando similaridade contra todo o vocabulário de uma vez.
 
@@ -114,7 +114,8 @@ luvinha/
 ├── main.py
 ├── glove/
 │   ├── glove.py          # embeddings + similaridade
-│   └── validator.py      # spellchecker + vocabulário
+│   ├── validator.py      # spellchecker + vocabulário
+│   └── pos_filter.py     # filtro de classe gramatical
 ├── leaderboard/
 │   └── leaderboard.py    # SQLite
 ├── app/
@@ -144,47 +145,41 @@ Roda em thread separada — a UI não bloqueia. 1.12 GB baixado na primeira exec
 
 ---
 
-# Similaridade e palavra secreta
+# Filtragem da palavra secreta
 
-```python
-class GloveModel:
-    def similarity(self, w1, w2):
-        vec1 = self._vectors[self._word_to_index[w1]]
-        vec2 = self._vectors[self._word_to_index[w2]]
-        dot = float(np.dot(vec1, vec2))
-        return dot / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+A palavra secreta passa por três filtros para garantir que seja **comum e fácil**:
 
-    def random_word(self):
-        if self._eligible_words is None:
-            self._eligible_words = [w for w in self._vocab
-                                    if is_valid_word(w)]
-        return random.choice(self._eligible_words)
-```
+**1. Frequência** — só as 5.000 palavras mais frequentes do vocabulário GloVe (o `vocab.txt` é ordenado por frequência, já que as palavras mais comuns aparecem primeiro). Descarta palavras raras e nomes próprios.
 
-`_eligible_words` é cacheado — evita refiltrar a cada sorteio.
+**2. Spell check (pyspellchecker)** — `is_valid_word` rejeita fragmentos, números e typos do vocabulário.
+
+**3. Classe gramatical (spaCy `pt_core_news_sm`)** — apenas **substantivos no singular** e **verbos no infinitivo**. Conjugações (`transmitida`, `comeu`), plurais (`casas`), adjetivos e advérbios são descartados.
+
+Resultado: **~1.700 palavras** base, todas substantivos comuns e verbos no infinitivo.
 
 ---
 
-# Validação
-
-Duas camadas: spell checker (português) + pertinência ao vocabulário GloVe.
+# Filtragem: código
 
 ```python
-from spellchecker import SpellChecker
+FREQUENCY_TOP_N = 5_000
 
-_spell = SpellChecker(language="pt")
+def random_word(self):
+    if self._eligible_words is None:
+        candidates = self._vocab[:FREQUENCY_TOP_N]
+        valid = [w for w in candidates if is_valid_word(w)]
+        self._eligible_words = filter_by_pos(valid)
+    return random.choice(self._eligible_words)
 
-def is_valid_word(word):
-    return len(word) >= 2 and word.lower() in _spell.known({word.lower()})
-
-class WordValidator:
-    def is_known(self, word):
-        return is_valid_word(word) and self._glove.has_word(word)
+def _is_base_form(token):
+    if token.pos_ == "NOUN":
+        return "Number=Sing" in token.morph
+    if token.pos_ == "VERB":
+        return "VerbForm=Inf" in token.morph
+    return False
 ```
 
-O spell checker também filtra o vocabulário do GloVe — os 930k tokens incluem lixo (fragmentos, números, typos). Sem filtragem, `random_word()` poderia sortear `xqq` ou `3.14`. O cache de `_eligible_words` reduz para ~100k palavras válidas.
-
-Palavras compostas com hífen são um edge case — o spell checker e o GloVe tokenizam de formas diferentes.
+`_eligible_words` é cacheado — evita refiltrar a cada sorteio. O spaCy processa em batch com `nlp.pipe`, mantendo o carregamento rápido.
 
 ---
 

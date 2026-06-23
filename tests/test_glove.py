@@ -105,9 +105,28 @@ def test_random_word_caches_eligible_list(
         return word in valid
 
     monkeypatch.setattr(glove_module, "is_valid_word", spy)
+    monkeypatch.setattr(glove_module, "filter_by_pos", lambda ws: list(ws))
 
     assert model.random_word() in valid
     calls_after_first = calls["n"]
 
     assert model.random_word() in valid
     assert calls["n"] == calls_after_first
+
+
+def test_random_word_restricts_to_most_frequent_top_n(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import numpy as np
+
+    monkeypatch.setattr(glove_module, "FREQUENCY_TOP_N", 3)
+    model = GloveModel()
+    model._vocab = ["comum1", "comum2", "comum3", "raro"]
+    model._word_to_index = {w: i for i, w in enumerate(model._vocab)}
+    model._vectors = np.zeros((4, 3))
+
+    monkeypatch.setattr(glove_module, "is_valid_word", lambda w: True)
+    monkeypatch.setattr(glove_module, "filter_by_pos", lambda ws: list(ws))
+
+    for _ in range(20):
+        assert model.random_word() != "raro"

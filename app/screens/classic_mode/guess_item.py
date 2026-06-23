@@ -1,6 +1,13 @@
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.widgets import Label, ProgressBar
+from textual.widgets import Label
+
+BAR_WIDTH = 10
+
+
+def _build_bar(score: int) -> str:
+    filled = max(0, min(BAR_WIDTH, round(score / 100)))
+    return "\u2588" * filled + "\u2591" * (BAR_WIDTH - filled)
 
 
 class GuessItem(Vertical):
@@ -21,14 +28,5 @@ class GuessItem(Vertical):
         self._score = score
 
     def compose(self) -> ComposeResult:
-        yield Label(self._word, id="guess-word")
-        yield ProgressBar(
-            total=1000,
-            show_percentage=False,
-            show_eta=False,
-            id="guess-progress",
-        )
-        yield Label(str(self._score), id="guess-score")
-
-    def on_mount(self) -> None:
-        self.query_one(ProgressBar).update(progress=self._score)
+        row = f"{self._word:<12}\u2192 {self._score:>4}  {_build_bar(self._score)}"
+        yield Label(row, id="guess-row")

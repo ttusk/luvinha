@@ -7,11 +7,14 @@ import numpy as np
 from huggingface_hub import hf_hub_download
 from safetensors.numpy import load_file
 
+from glove.pos_filter import filter_by_pos
 from glove.validator import is_valid_word
 
 REPO_ID = "nilc-nlp/glove-300d"
 EMBEDDINGS_FILE = "embeddings.safetensors"
 VOCAB_FILE = "vocab.txt"
+
+FREQUENCY_TOP_N = 5_000
 
 
 class GloveModel:
@@ -93,7 +96,9 @@ class GloveModel:
         if not self.is_loaded:
             raise RuntimeError("Model not loaded. Call load() first.")
         if self._eligible_words is None:
-            self._eligible_words = [w for w in self._vocab if is_valid_word(w)]
+            candidates = self._vocab[:FREQUENCY_TOP_N]
+            valid = [w for w in candidates if is_valid_word(w)]
+            self._eligible_words = filter_by_pos(valid)
         return random.choice(self._eligible_words)
 
     def _get_vector(self, word: str) -> np.ndarray | None:

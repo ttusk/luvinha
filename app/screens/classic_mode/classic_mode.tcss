@@ -80,6 +80,6 @@ ClassicMode {
 }
 
 #ranking-grid GuessItem {
-    height: 3;
+    height: 1;
     margin: 0;
 }

@@ -1,28 +1,14 @@
 GuessItem {
-    height: 3;
+    height: 1;
     width: 100%;
-    content-align: center middle;
+    content-align: left middle;
     text-style: bold;
 }
 
-#guess-word {
+#guess-row {
     width: 100%;
     height: 1;
     color: $text;
-    text-align: center;
+    text-align: left;
     text-style: bold;
-}
-
-#guess-progress {
-    width: 100%;
-    height: 1;
-    margin: 0;
-    padding: 0;
-}
-
-#guess-score {
-    width: 100%;
-    height: 1;
-    color: $text-muted;
-    text-align: center;
 }
